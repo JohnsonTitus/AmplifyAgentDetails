@@ -40,53 +40,58 @@
         document.getElementById('loadAgentsBtn').addEventListener('click', loadAgentDetails);
 
         async function loadAgentDetails() {
-    try {
-        const response = await fetch('https://nt8rgr84ce.execute-api.us-east-1.amazonaws.com/develop', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            mode: 'cors'
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+            try {
+                const response = await fetch('https://nt8rgr84ce.execute-api.us-east-1.amazonaws.com/develop', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok, status: ${response.status}`);
+                }
+        
+                const jsonResponse = await response.json();  // Parse response as JSON
+                console.log("Parsed JSON Response:", jsonResponse);
+        
+                // Check if `body` is an array, or extract it if needed
+                const agents = Array.isArray(jsonResponse.body) ? jsonResponse.body : [];
+                
+                console.log("Final Parsed Agents Array:", agents);
+        
+                if (!Array.isArray(agents)) {
+                    throw new Error("Unexpected API response format, expected an array.");
+                }
+        
+                const tableBody = document.getElementById("agentTableBody");
+                tableBody.innerHTML = '';  // Clear previous content
+        
+                // Populate table with agent details
+                agents.forEach(agent => {
+                    const row = `
+                        <tr>
+                            <td>${agent.UserName || 'N/A'}</td>
+                            <td>N/A</td>  <!-- No first_name in response -->
+                            <td>N/A</td>  <!-- No last_name in response -->
+                            <td>${agent.Extension || 'N/A'}</td>
+                            <td>
+                                <button onclick="editAgent('${agent.UserName || ''}')">Edit</button>
+                                <button onclick="deleteAgent('${agent.UserName || ''}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+        
+                    tableBody.innerHTML += row;
+                });
+        
+            } catch (error) {
+                console.error("Error fetching agent details:", error);
+                alert("Failed to load agent details");
+            }
         }
-
-        const agents = await response.json();  // jsonResponse is an object
-        //const agents = JSON.parse(jsonResponse.body);  // Parse the stringified body
-
-        console.log("Parsed API Response:", agents);  // Debugging log
-
-        // Ensure it's an array before proceeding
-        if (!Array.isArray(agents)) {
-            throw new Error("Unexpected API response format, expected an array");
-        }
-
-        const tableBody = document.getElementById('agentTableBody');
-        tableBody.innerHTML = '';
-
-        agents.forEach(agent => {
-            const row = `
-                <tr>
-                    <td>${agent.UserName || 'N/A'}</td>
-                    <td>${agent.AgentId || 'N/A'}</td>
-                    <td>${agent.AgentARN || 'N/A'}</td>
-                    <td>${agent.Extension || 'N/A'}</td>
-                    <td>
-                        <button onclick="editAgent('${agent.UserName || ''}')">Edit</button>
-                        <button onclick="deleteAgent('${agent.UserName || ''}')">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tableBody.innerHTML += row;
-        });
-    } catch (error) {
-        console.error('Error fetching agent details:', error);
-        alert('Failed to load agent details');
-    }
-}
-
+        
 
         function editAgent(username) {
             // Implement edit functionality
