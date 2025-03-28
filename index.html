@@ -1,45 +1,100 @@
-async function loadAgentDetails() {
-    try {
-        const response = await fetch('https://nt8rgr84ce.execute-api.us-east-1.amazonaws.com/develop', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            mode: 'cors'
-        });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Admin Page</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Agent Administration</h1>
+    <button id="loadAgentsBtn">Load Agent Details</button>
+    <table id="agentTable">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Extension</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="agentTableBody">
+            <!-- Agent details will be dynamically populated here -->
+        </tbody>
+    </table>
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
+    <script>
+        document.getElementById('loadAgentsBtn').addEventListener('click', loadAgentDetails);
+
+        async function loadAgentDetails() {
+            try {
+                const response = await fetch('https://nt8rgr84ce.execute-api.us-east-1.amazonaws.com/develop', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+        
+                const agents = await response.json();
+                console.log("API Response:", agents);  // Debugging log
+        
+                // Check if response is an array
+                if (!Array.isArray(agents)) {
+                    throw new Error("Unexpected API response format, expected an array");
+                }
+        
+                const tableBody = document.getElementById('agentTableBody');
+                tableBody.innerHTML = '';
+        
+                agents.forEach(agent => {
+                    const row = `
+                        <tr>
+                            <td>${agent.username || 'N/A'}</td>
+                            <td>${agent.first_name || 'N/A'}</td>
+                            <td>${agent.last_name || 'N/A'}</td>
+                            <td>${agent.extension || 'N/A'}</td>
+                            <td>
+                                <button onclick="editAgent('${agent.username || ''}')">Edit</button>
+                                <button onclick="deleteAgent('${agent.username || ''}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error fetching agent details:', error);
+                alert('Failed to load agent details');
+            }
+        }
+        
+
+        function editAgent(username) {
+            // Implement edit functionality
+            alert(`Edit agent: ${username}`);
         }
 
-        const agents = await response.json();
-        console.log("API Response:", agents);  // Debugging log
-
-        // Check if response is an array
-        if (!Array.isArray(agents)) {
-            throw new Error("Unexpected API response format, expected an array");
+        function deleteAgent(username) {
+            // Implement delete functionality
+            alert(`Delete agent: ${username}`);
         }
-
-        const tableBody = document.getElementById('agentTableBody');
-        tableBody.innerHTML = '';
-
-        agents.forEach(agent => {
-            const row = `
-                <tr>
-                    <td>${agent.username || 'N/A'}</td>
-                    <td>${agent.first_name || 'N/A'}</td>
-                    <td>${agent.last_name || 'N/A'}</td>
-                    <td>${agent.extension || 'N/A'}</td>
-                    <td>
-                        <button onclick="editAgent('${agent.username || ''}')">Edit</button>
-                        <button onclick="deleteAgent('${agent.username || ''}')">Delete</button>
-                    </td>
-                </tr>
-            `;
-            tableBody.innerHTML += row;
-        });
-    } catch (error) {
-        console.error('Error fetching agent details:', error);
-        alert('Failed to load agent details');
-    }
-}
+    </script>
+</body>
+</html>
