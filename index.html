@@ -53,8 +53,8 @@
             throw new Error('Network response was not ok');
         }
 
-        const jsonResponse = await response.json();  // jsonResponse is an object
-        const agents = JSON.parse(jsonResponse.body);  // Parse the stringified body
+        const agents = await response.json();  // jsonResponse is an object
+        //const agents = JSON.parse(jsonResponse.body);  // Parse the stringified body
 
         console.log("Parsed API Response:", agents);  // Debugging log
 
