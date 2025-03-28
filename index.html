@@ -73,8 +73,8 @@
                     const row = `
                         <tr>
                             <td>${agent.UserName || 'N/A'}</td>
-                            <td>N/A</td>  <!-- No first_name in response -->
-                            <td>N/A</td>  <!-- No last_name in response -->
+                            <td>${agent.AgentId || 'N/A'}</td>
+                             <td>${agent.AgentARN || 'N/A'}</td>
                             <td>${agent.Extension || 'N/A'}</td>
                             <td>
                                 <button onclick="editAgent('${agent.UserName || ''}')">Edit</button>
